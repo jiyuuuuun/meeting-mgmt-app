@@ -1,5 +1,6 @@
 package com.example.meetingmanagement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -31,7 +32,8 @@ public class Schedule {
     @Column(name = "schedule_location", nullable = false, length = 50)
     private String scheduleLocation;
 
-    @OneToMany(mappedBy = "schedule")
+    @JsonIgnore
+    @OneToMany(mappedBy = "schedule",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduleParticipant> participants = new ArrayList<>();
 
 }

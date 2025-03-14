@@ -1,0 +1,8 @@
+package com.example.meetingmanagement.repository;
+
+import com.example.meetingmanagement.entity.Role;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RoleRepository extends JpaRepository<Role, Long> {
+    Role findByRoleName(String name);
+}

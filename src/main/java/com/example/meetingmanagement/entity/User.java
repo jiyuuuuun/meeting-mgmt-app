@@ -1,5 +1,6 @@
 package com.example.meetingmanagement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,12 +28,13 @@ public class User {
     @Column(name = "user_password", nullable = false)
     private String userPassword;
 
-    @Column(name = "user_name", nullable = false)
+    @Column(name = "user_name")
     private String userName;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt=LocalDateTime.now();
 
+    @JsonIgnore //순환참조 막기
     @OneToMany(mappedBy = "creator")
     private List<Meeting> meetings = new ArrayList<>();
 

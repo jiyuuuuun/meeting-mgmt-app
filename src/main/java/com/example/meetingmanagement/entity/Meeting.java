@@ -1,12 +1,18 @@
 package com.example.meetingmanagement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "meetings")
+@Getter@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Meeting {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +35,18 @@ public class Meeting {
     @OneToMany(mappedBy = "meeting")
     private List<Schedule> schedules = new ArrayList<>();
 
-    @OneToMany(mappedBy = "meeting")
+    @JsonIgnore
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MeetingParticipant> participants = new ArrayList<>();
 
+
+    @Override
+    public String toString() {
+        return "Meeting{" +
+                "meetingId=" + meetingId +
+                ", creator=" + creator +
+                ", meetingName='" + meetingName + '\'' +
+                ", meetingDescription='" + meetingDescription + '\'' +
+                '}';
+    }
 }
