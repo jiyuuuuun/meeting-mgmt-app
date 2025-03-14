@@ -40,7 +40,7 @@ public class Meeting {
     private int maxParticipants = 10;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "meeting")
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     @Schema(description = "모임 일정 리스트")
     private List<Schedule> schedules = new ArrayList<>();
 

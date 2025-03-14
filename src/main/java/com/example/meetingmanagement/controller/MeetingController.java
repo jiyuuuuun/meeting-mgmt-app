@@ -177,6 +177,18 @@ public class MeetingController {
         List<UserResponseDTO> userResponseDTOS=scheduleService.getParticipants(scheduleId);
         return ResponseEntity.ok().body(userResponseDTOS);
     }
+    @DeleteMapping("/{meetingID}/leave")
+    public ResponseEntity<?> leaveSchedule(@PathVariable(name = "meetingID") Long meetingID,HttpServletRequest request){
+        String token = request.getHeader("Authorization");
+        log.info("token:" + token);
+        User user = userService.getUser(token);
+        if(meetingService.leaveMeeting(meetingID,user)){
+            return ResponseEntity.ok().build();
+        }else{
+            return ResponseEntity.status(401).build();
+        }
+
+    }
 
 
 }
