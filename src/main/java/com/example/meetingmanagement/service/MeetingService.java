@@ -3,7 +3,6 @@ package com.example.meetingmanagement.service;
 import com.example.meetingmanagement.dto.UserResponseDTO;
 import com.example.meetingmanagement.entity.Meeting;
 import com.example.meetingmanagement.entity.MeetingParticipant;
-import com.example.meetingmanagement.entity.Schedule;
 import com.example.meetingmanagement.entity.User;
 import com.example.meetingmanagement.repository.MeetingParticipantRepository;
 import com.example.meetingmanagement.repository.MeetingRepository;
@@ -24,12 +23,12 @@ public class MeetingService {
 
     //미팅 생성
     @Transactional
-    public void createMeeting(Meeting meeting,User user) {
+    public void createMeeting(Meeting meeting, User user) {
         meeting.setCreator(user);
         MeetingParticipant meetingParticipant = new MeetingParticipant(user, meeting);
         meeting.getParticipants().add(meetingParticipant);
         meetingRepository.save(meeting);
-        log.info("미팅 생성 완료:: "+meeting.toString());
+        log.info("미팅 생성 완료:: " + meeting.toString());
 
     }
 
@@ -41,8 +40,8 @@ public class MeetingService {
 
     //미팅 수정
     @Transactional
-    public boolean updateMeeting(Meeting newMeeting, User user,Long meetingId) {
-        Meeting Meeting=meetingRepository.findById(meetingId).orElse(null);
+    public boolean updateMeeting(Meeting newMeeting, User user, Long meetingId) {
+        Meeting Meeting = meetingRepository.findById(meetingId).orElse(null);
         if (!Meeting.getCreator().equals(user)) {
             log.info("미팅의 생성자만 미팅을 수정할 수 있습니다.");
             return false;
@@ -54,6 +53,7 @@ public class MeetingService {
         log.info(Meeting.toString());
         return true;
     }
+
     //미팅 삭제
     @Transactional
     public boolean deleteMeeting(Meeting meeting, User user) {
@@ -70,9 +70,10 @@ public class MeetingService {
 
         return true;
     }
+
     //미팅 참가
     @Transactional
-    public boolean joinMeeting(Meeting meeting, User user)  {
+    public boolean joinMeeting(Meeting meeting, User user) {
         // 이미 참가한 사용자인지 확인
         boolean isAlreadyJoined = meeting.getParticipants().stream()
                 .anyMatch(p -> p.getUser().equals(user));
@@ -95,23 +96,42 @@ public class MeetingService {
 
         return true;
     }
+
     //미팅 참가자 목록 조회
     @Transactional(readOnly = true)
     public List<UserResponseDTO> getMeetingUser(Meeting meeting) {
-        Meeting meeting1=meetingRepository.findById(meeting.getMeetingId()).orElseThrow();
-        List<UserResponseDTO> users=new ArrayList<>();
-        meeting1.getParticipants().forEach(p->{
+        Meeting meeting1 = meetingRepository.findById(meeting.getMeetingId()).orElseThrow();
+        List<UserResponseDTO> users = new ArrayList<>();
+        meeting1.getParticipants().forEach(p -> {
             users.add(UserResponseDTO.builder().name(p.getUser().getUserName()).id(p.getUser().getUserId()).build());
         });
 
         return users;
     }
+
     @Transactional(readOnly = true)
     public Meeting findMeeting(Long id) {
-        if(id ==null)
+        if (id == null)
             return null;
         return meetingRepository.findById(id).orElseThrow();
     }
 
-
+    //미팅 탈퇴
+    @Transactional
+    public boolean leaveMeeting(Long meetingId, User user) {
+        boolean isMeetingParticipant = false;
+        Meeting meeting = meetingRepository.findById(meetingId).orElseThrow();
+        List<MeetingParticipant> meetingParticipants = meeting.getParticipants();
+        for (MeetingParticipant meetingParticipant : meetingParticipants) {
+            if (meetingParticipant.getUser().getUserId() == user.getUserId()) {
+                meetingParticipants.remove(meetingParticipant);
+                isMeetingParticipant = true;
+                break;
+            }
+        }
+        if (meeting.getParticipants().isEmpty()) {
+            meetingRepository.delete(meeting);
+        }
+        return isMeetingParticipant;
+    }
 }
