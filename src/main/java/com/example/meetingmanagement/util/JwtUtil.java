@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class JwtUtil {
     private static final String SECRET = "my-secret-key";
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60;
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60*24;
     private final ConcurrentHashMap<String, Boolean> invalidTokens = new ConcurrentHashMap<>();
 
     public String generateToken(Long userId) {
