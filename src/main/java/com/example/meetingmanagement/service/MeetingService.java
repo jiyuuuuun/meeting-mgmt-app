@@ -3,6 +3,7 @@ package com.example.meetingmanagement.service;
 import com.example.meetingmanagement.dto.UserResponseDTO;
 import com.example.meetingmanagement.entity.Meeting;
 import com.example.meetingmanagement.entity.MeetingParticipant;
+import com.example.meetingmanagement.entity.Schedule;
 import com.example.meetingmanagement.entity.User;
 import com.example.meetingmanagement.repository.MeetingParticipantRepository;
 import com.example.meetingmanagement.repository.MeetingRepository;
@@ -107,7 +108,10 @@ public class MeetingService {
     }
     @Transactional(readOnly = true)
     public Meeting findMeeting(Long id) {
+        if(id ==null)
+            return null;
         return meetingRepository.findById(id).orElseThrow();
     }
+
 
 }

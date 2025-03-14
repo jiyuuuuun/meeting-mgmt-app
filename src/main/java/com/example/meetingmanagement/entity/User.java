@@ -41,7 +41,7 @@ public class User {
     @Schema(description = "계정 생성일", example = "2025-03-14T09:18:12.608877")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @JsonIgnore
+    @JsonIgnore//JSON 직렬화 시 해당 필드를 제외함
     @OneToMany(mappedBy = "creator")
     @Schema(description = "사용자가 생성한 모임 리스트")
     private List<Meeting> meetings = new ArrayList<>();

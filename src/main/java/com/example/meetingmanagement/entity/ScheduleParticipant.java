@@ -2,8 +2,11 @@ package com.example.meetingmanagement.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter@Setter
 @Schema(description = "일정 참가 엔티티")
 public class ScheduleParticipant {
     @Id
