@@ -3,8 +3,10 @@ package com.example.meetingmanagement.controller;
 import com.example.meetingmanagement.dto.ErrorResponseDTO;
 import com.example.meetingmanagement.dto.UserResponseDTO;
 import com.example.meetingmanagement.entity.Meeting;
+import com.example.meetingmanagement.entity.Schedule;
 import com.example.meetingmanagement.entity.User;
 import com.example.meetingmanagement.service.MeetingService;
+import com.example.meetingmanagement.service.ScheduleService;
 import com.example.meetingmanagement.service.UserService;
 import com.example.meetingmanagement.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,8 +29,9 @@ import java.util.List;
 @Tag(name = "모임 API", description = "모임 관련 API")
 public class MeetingController {
     private final MeetingService meetingService;
-    private final JwtUtil jwtUtil;
+    private final ScheduleService scheduleService;
     private final UserService userService;
+
 
     @PostMapping
     @Operation(
@@ -127,8 +130,53 @@ public class MeetingController {
 
     @GetMapping("/{meetingId}/participants")
     @Operation(summary = "모임 참가자 조회", description = "모임에 참가한 유저 목록을 조회합니다.")
-    public ResponseEntity<List<UserResponseDTO>> getParticipants(
+    public ResponseEntity<List<UserResponseDTO>> getMeetingParticipants(
             @PathVariable(name = "meetingId") @Parameter(description = "참가자를 조회할 모임 ID") Long meetingId) {
         return ResponseEntity.ok().body(meetingService.getMeetingUser(meetingService.findMeeting(meetingId)));
     }
+    @PostMapping("/{meetingID}/schedules")
+    public ResponseEntity<?> addSchedule(@PathVariable(name = "meetingID") Long meetingID,HttpServletRequest request,@RequestBody Schedule schedule){
+        String token = request.getHeader("Authorization");
+        log.info("token:" + token);
+        User user = userService.getUser(token);
+        if(scheduleService.createSchedule(schedule,user,meetingID)) {
+            return ResponseEntity.ok().build();
+        }else{
+            return ResponseEntity.status(401).build();
+        }
+    }
+    @GetMapping("/{meetingID}/schedules")
+    public ResponseEntity<List<Schedule>> getSchedules(@PathVariable(name = "meetingID") Long meetingID) {
+        List<Schedule> schedules=scheduleService.getSchedulesByMeetingId(meetingID);
+        return ResponseEntity.ok().body(schedules);
+    }
+    @PostMapping("/{meetingID}/schedules/{scheduleId}/join")
+    public ResponseEntity<?> joinSchedule(@PathVariable(name = "meetingID") Long meetingID,@PathVariable(name = "scheduleId") Long scheduleId,HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        log.info("token:" + token);
+        User user = userService.getUser(token);
+       if(scheduleService.joinSchedule(user,meetingID,scheduleId)){
+           return ResponseEntity.ok().build();
+       }else{
+           return ResponseEntity.status(401).build();
+       }
+    }
+    @DeleteMapping("/{meetingID}/schedules/{scheduleId}/leave")
+    public ResponseEntity<?> leaveSchedule(@PathVariable(name = "meetingID") Long meetingID,@PathVariable(name = "scheduleId") Long scheduleId,HttpServletRequest request){
+        String token = request.getHeader("Authorization");
+        log.info("token:" + token);
+        User user = userService.getUser(token);
+        if(scheduleService.leaveSchedule(user,meetingID,scheduleId)){
+            return ResponseEntity.ok().build();
+        }else {
+            return ResponseEntity.status(401).build();
+        }
+    }
+    @GetMapping("/schedules/{scheduleId}/participants")
+    public ResponseEntity<List<UserResponseDTO>> getScheduleParticipants(@PathVariable(name = "scheduleId") Long scheduleId){
+        List<UserResponseDTO> userResponseDTOS=scheduleService.getParticipants(scheduleId);
+        return ResponseEntity.ok().body(userResponseDTOS);
+    }
+
+
 }

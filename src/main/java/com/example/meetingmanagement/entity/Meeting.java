@@ -39,6 +39,7 @@ public class Meeting {
     @Schema(description = "최대 참가 가능 인원", example = "10")
     private int maxParticipants = 10;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "meeting")
     @Schema(description = "모임 일정 리스트")
     private List<Schedule> schedules = new ArrayList<>();
